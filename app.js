@@ -22,7 +22,7 @@ const B=[
  {k:'entre',n:'Entré',x:72,y:26.5,w:2,d:1.8,h:1.5,g:.8,wall:OFF,roof:DK,txt:'Entré till hallarna.'},
  {k:'kok',n:'Kök',x:34.5,y:21.5,w:11,d:5.5,h:2.8,wall:OFF,roof:LT,win:1,lab:1,txt:'Köket.'},
  {k:'lagers',n:'Lager',x:45.5,y:21.5,w:8.5,d:5.3,h:2.8,wall:OFF,roof:LT,win:1,lab:1,txt:'Lager intill svetsen.'},
- {k:'kontor',n:'Kontor',x:25,y:22.5,w:8.5,d:9.5,h:2.8,g:1.2,wall:OFF,roof:[52,58,66],win:1,lab:1,txt:'Tjänstemännen sitter här.'},
+ {k:'kontor',n:'Kontor',x:25,y:27,w:8.5,d:5,h:4.8,g:2.4,wall:OFF,roof:[52,58,66],win:2,lab:1,txt:'Tjänstemännen sitter här.'},
  {k:'kontor',n:'Kontor',x:36.25,y:28.25,w:6.5,d:3.8,h:2.8,a:.45,wall:OFF,roof:[176,180,184],win:1,txt:'Tjänstemännen sitter här.'},
  {k:'entre',n:'Gästingång',x:34.2,y:33,w:2.6,d:2.8,h:2.2,a:SK,wall:[150,186,204],roof:[70,76,84],txt:'Glasad entré för besökare.'},
  {k:'matsal',n:'Matsal',x:43.6,y:27.2,w:4.8,d:5,h:2.8,a:SK,wall:OFF,roof:[60,66,74],win:1,lab:1,txt:'Matsalen, sitter ihop med kontoren.'},
@@ -178,7 +178,7 @@ function buildSchedule(from){sched=[];const add=(t,fn)=>{if(t>from)sched.push({t
  for(let t=430+rnd()*30;t<940;t+=40+rnd()*35)add(t,machineMove);sched.sort((a,b)=>a.t-b.t)}
 function resetTo(t){clock=t;vehicles=[];jobs=[];rigBusy=false;sel=null;SPOTS.forEach(s=>s.busy=false);TS4.busy=TS7.busy=false;stat={inn:0,pack:0,out:0};
  forks=[];setForks(+$('nFork').value);cars.forEach(c=>{c.st=t>=c.arr&&t<c.dep?'parked':'away';c.done=t>=c.dep});buildSchedule(t);$('log').innerHTML='';info()}
-cars=SLOTS.map(sl=>({sl,col:pick(CARCOL),arr:rnd()<.85?330+(rnd()+rnd()+rnd())/3*120:450+rnd()*90,dep:rnd()<.8?930+(rnd()+rnd()+rnd())/3*60:840+rnd()*240,st:'away'}));
+cars=SLOTS.map(sl=>({sl,col:pick(CARCOL),arr:rnd()<.85?330+(rnd()+rnd()+rnd())/3*120:450+rnd()*90,dep:rnd()<.55?900+(rnd()+rnd())/2*120:780+rnd()*330,st:'away'}));
 function stepCars(){for(const c of cars){
   if(c.st==='away'&&!c.done&&clock>=c.arr&&clock<c.dep){c.st='moving';const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg in',what:'–',order:'–'});go(v,c.sl.path);call(v,()=>{c.st='parked';kill(v)})}
   else if(c.st==='parked'&&clock>=c.dep){c.st='moving';c.done=true;const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg hem',what:'–',order:'–',x:c.sl.x,y:c.sl.y,ang:c.sl.a,ta:c.sl.a});go(v,c.sl.path.slice(0,-1).reverse().concat([START]));call(v,()=>{c.st='away';kill(v)})}}}
