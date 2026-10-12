@@ -1,11 +1,11 @@
 (()=>{
 const $=id=>document.getElementById(id),cv=$('yard'),ctx=cv.getContext('2d');
-let W=800,H=500,S=6,zoom=1,panX=0,panY=0;
+let W=800,H=500,S=6,zoom=1,panX=0,panY=0,zOff=0;
 const CEN={x:69,y:32},CLOCK=2;
 let seed=7;const srnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 const rnd=Math.random,pick=a=>a[rnd()*a.length|0];
 const col=(c,f)=>`rgb(${Math.min(255,c[0]*f|0)},${Math.min(255,c[1]*f|0)},${Math.min(255,c[2]*f|0)})`;
-function P(x,y,z=0){const s=S*zoom;return[W/2+panX+((x+y)-(CEN.x+CEN.y))*s,H/2+panY+((y-x)-(CEN.y-CEN.x))*s*.5-z*s]}
+function P(x,y,z=0){const s=S*zoom;return[W/2+panX+((x+y)-(CEN.x+CEN.y))*s,H/2+panY+((y-x)-(CEN.y-CEN.x))*s*.5-(z+zOff)*s]}
 function poly(pts,fill,stroke,lw){ctx.beginPath();for(let i=0;i<pts.length;i++)i?ctx.lineTo(pts[i][0],pts[i][1]):ctx.moveTo(pts[i][0],pts[i][1]);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=fill;ctx.lineWidth=.6;ctx.stroke()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke()}}
 const wp=a=>a.map(p=>P(p[0],p[1],p[2]||0));
 
@@ -23,9 +23,10 @@ const B=[
  {k:'kok',n:'Kök',x:34.5,y:21.5,w:11,d:5.5,h:2.8,wall:OFF,roof:LT,win:1,lab:1,txt:'Köket.'},
  {k:'lagers',n:'Lager',x:45.5,y:21.5,w:8.5,d:5.3,h:2.8,wall:OFF,roof:LT,win:1,lab:1,txt:'Lager intill svetsen.'},
  {k:'kontor',n:'Kontor',x:25,y:22.5,w:8.5,d:9.5,h:2.8,g:1.2,wall:OFF,roof:[52,58,66],win:1,lab:1,txt:'Tjänstemännen sitter här.'},
- {k:'kontor',n:'Kontor',x:35,y:27.6,w:8.6,d:5.2,h:2.8,a:SK,wall:OFF,roof:[176,180,184],win:1,lab:1,txt:'Tjänstemännen sitter här.'},
+ {k:'kontor',n:'Kontor',x:36.25,y:28.25,w:6.5,d:3.8,h:2.8,a:.45,wall:OFF,roof:[176,180,184],win:1,txt:'Tjänstemännen sitter här.'},
+ {k:'entre',n:'Gästingång',x:34.2,y:33,w:2.6,d:2.8,h:2.2,a:SK,wall:[150,186,204],roof:[70,76,84],txt:'Glasad entré för besökare.'},
  {k:'matsal',n:'Matsal',x:43.6,y:27.2,w:4.8,d:5,h:2.8,a:SK,wall:OFF,roof:[60,66,74],win:1,lab:1,txt:'Matsalen, sitter ihop med kontoren.'},
- {k:'kontor',n:'Kontor, två våningar',x:37.5,y:33.3,w:12,d:5.5,h:4.8,g:2.4,a:SK,wall:OFF,roof:[60,66,74],win:2,lab:1,txt:'Tjänstemännen sitter här. Gästingång på västra sidan, gästparkering framför.'},
+ {k:'kontor',n:'Kontor',lx:4,x:37.5,y:33.3,w:12,d:5.5,h:4.8,g:2.4,a:SK,wall:OFF,roof:[60,66,74],win:2,lab:1,txt:'Tjänstemännen sitter här. Gästingång på västra sidan, gästparkering framför.'},
  {k:'pack',n:'Packavdelning',x:68,y:40,w:24,d:13,h:4.4,g:2.8,a:HK,wall:BRN,roof:DK,sock:1,lab:1,doors:[{w:43.5,n:1,k:1.5,z:3.3,c:WD},{w:49.5,n:2,k:1.5,z:3.3,c:WD}],txt:'Maskiner packas för frakt. Truckarna kör in via Port 1, kundlastbilar lastas från Port 2. Lager i östra delen.'},
  {k:'silo',n:'Silohall',x:64.75,y:57.5,w:24.5,d:9,h:7.6,g:.8,a:HK,wall:[82,88,96],roof:[58,63,70],lab:1,sign:1,doors:[{w:59.8,n:9,k:1.7,z:4.2,c:'#c5c9cd'},{w:64.2,n:10,k:1.7,z:4.2,c:'#c5c9cd'}],txt:'Silos upp till 30 m kommer in via Port 10 för elinstallation och isolering, sedan vidare till kund.'}
 ];
@@ -40,16 +41,16 @@ const fEdge=x=>x<33?10.5:x<81?5:12;
 const TREES=[];for(let i=0;i<900;i++){const x=-70+srnd()*230,y=-70+srnd()*84;if(y<fEdge(x)-1)TREES.push([x,y,1.2+srnd()*1.1,srnd()])}
 TREES.sort((a,b)=>(a[1]-a[0])-(b[1]-b[0]));
 const SLOTS=[],RIN=[[0,15],[27.5,37.5],[39,45]];
-{const NE=RIN.concat([[45.5,48.3],[51,46.3],[58,42.5],[70,33.8],[77,33],[81.5,36],[86,36.3]]);
- for(let i=0;i<6;i++){const y=16.5+2*i;SLOTS.push({x:87,y,a:0,path:NE.concat([[90,33],[90,y],[87,y]])})}
- for(let i=0;i<4;i++){const x=86.3-1.6*i,y=28.8+1.7*i;SLOTS.push({x,y,a:Math.PI/4,path:NE.concat([[x+2.6,y+2.7],[x,y]])})}
- for(let i=0;i<3;i++){const y=21+2*i;SLOTS.push({x:93.5,y,a:0,path:NE.concat([[90,33],[90,y],[93.5,y]])})}
- const dx=.546,dy=.838,SE=RIN.concat([[47,50],[65,70]]);
+const PAD=[84.5,14.5,98,35],PADZ=1.2;
+function groundZ(x,y){if(x>PAD[0]-.1&&x<PAD[2]+.1&&y>PAD[1]-.1&&y<PAD[3]+.05)return PADZ;if(x>85.9&&x<92.1&&y>=PAD[3]&&y<39.5)return PADZ*(39.5-y)/4.5;return 0}
+{const NE=RIN.concat([[45.5,48.3],[51,46.3],[58,42.5],[70,33.8],[77,34.2],[83,38.8],[89,40.3],[89,34],[90.5,31]]);
+ for(let r=0;r<2;r++)for(let i=0;i<9;i++){const x=r?94:87,y=16.5+2*i;SLOTS.push({x,y,a:0,path:NE.concat([[90.5,y],[x,y]])})}
+const dx=.546,dy=.838,SE=RIN.concat([[47,50],[65,70]]);
  for(let r=0;r<2;r++)for(let i=0;i<8;i++){const x=75+1.75*i,y=r?75.5:71.5;SLOTS.push({x,y,a:Math.PI/2,path:SE.concat([[68.9,76],[72.3,74],[x,73.5],[x,y]])})}
  for(let i=0;i<11;i++){if(i===2||i===3)continue;const t=2+2.1*i;SLOTS.push({x:65+dx*t+2.5,y:70+dy*t-1.64,a:Math.atan2(dy,dx)+Math.PI/2,path:SE.concat([[65+dx*t,70+dy*t],[65+dx*t+2.5,70+dy*t-1.64]])})}}
 const GUEST=[[45,40.6],[47,40.6],[49,40.6]];
-const TAGS=[['Gästparkering',48,43],['Parkering',90.5,31],['Parkering',81.5,73.5],['Används ej',26,17.5],['Ingång gäster',34.5,37]];
-const GOODS=[[74.5,36.2,'cyl',0,1.1,1.9],[76.8,36.6,'cyl',0,1.2,2.2],[79,37,'cyl',0,1,1.7],[77.8,38.3,'cyl',0,.8,1.3],[81.6,23,'cont',1.57],[63.3,59,'stallning',.2],[63,57.3,'pall',.4],[64.5,55.2,'stallning',.2],[66.9,43.8,'stallning',1.77]];for(let i=0;i<6;i++)GOODS.push([96+srnd()*1.2,27+i*1.9+srnd()*.5,srnd()<.5?'lada':'pall',srnd()*.4]);
+const TAGS=[['Gästparkering',48,43],['Parkering',90.5,31],['Parkering',81.5,73.5],['Används ej',26,17.5],['Ingång gäster',32.5,38.8]];
+const GOODS=[[72.5,36.6,'cyl',0,1.1,1.9],[74.6,37.1,'cyl',0,1.2,2.2],[76.6,37.8,'cyl',0,.9,1.7],[70.6,36.2,'cyl',0,.7,1.3],[81.6,23,'cont',1.57],[63.3,59,'stallning',.2],[63,57.3,'pall',.4],[64.5,55.2,'stallning',.2],[66.9,43.8,'stallning',1.77]];for(let i=0;i<6;i++)GOODS.push([96.4+srnd()*.9,17+i*2.4+srnd()*.5,srnd()<.5?'lada':'pall',srnd()*.4]);
 
 /* ---------- ritprimitiver ---------- */
 function obox(x,y,L,Wd,z0,z1,a,c){const co=Math.cos(a),si=Math.sin(a),h=[[L/2,Wd/2],[L/2,-Wd/2],[-L/2,-Wd/2],[-L/2,Wd/2]].map(p=>[x+p[0]*co-p[1]*si,y+p[0]*si+p[1]*co]),N=[[co,si],[si,-co],[-co,-si],[-si,co]];
@@ -172,16 +173,16 @@ function silo(inb){if(rigBusy){later(()=>silo(inb),40);return}if(!inb&&hall8<1)r
  go(v,[F,[57,59.6],[53,56.7],[47,50],[39,45],[27.5,37.5],[0,15],[-45,-23.3]]);call(v,()=>{rigBusy=false;kill(v)})}
 const NV=()=>+$('nVan').value,NO=()=>+$('nOut').value,NS=()=>+$('nSilo').value;
 function buildSchedule(from){sched=[];const add=(t,fn)=>{if(t>from)sched.push({t,fn})};
- for(let i=0;i<NV();i++)add(435+rnd()*510,spawnVan);for(let i=0;i<1+(rnd()<.5);i++)add(450+rnd()*390,spawnPlat);
- for(let i=0;i<NO();i++)add(480+rnd()*450,spawnOut);for(let i=0;i<NS();i++){add(450+rnd()*210,()=>silo(1));add(720+rnd()*200,()=>silo(0))}
+ for(let i=0;i<NV();i++)add(600+rnd()*300,spawnVan);for(let i=0;i<1+(rnd()<.5);i++)add(600+rnd()*270,spawnPlat);
+ for(let i=0;i<NO();i++)add(600+rnd()*300,spawnOut);for(let i=0;i<NS();i++){add(600+rnd()*180,()=>silo(1));add(790+rnd()*110,()=>silo(0))}
  for(let t=430+rnd()*30;t<940;t+=40+rnd()*35)add(t,machineMove);sched.sort((a,b)=>a.t-b.t)}
 function resetTo(t){clock=t;vehicles=[];jobs=[];rigBusy=false;sel=null;SPOTS.forEach(s=>s.busy=false);TS4.busy=TS7.busy=false;stat={inn:0,pack:0,out:0};
  forks=[];setForks(+$('nFork').value);cars.forEach(c=>{c.st=t>=c.arr&&t<c.dep?'parked':'away';c.done=t>=c.dep});buildSchedule(t);$('log').innerHTML='';info()}
-cars=SLOTS.map(sl=>({sl,col:pick(CARCOL),arr:420+(rnd()+rnd())*60,dep:900+(rnd()+rnd())*60,st:'away'}));
+cars=SLOTS.map(sl=>({sl,col:pick(CARCOL),arr:rnd()<.85?330+(rnd()+rnd()+rnd())/3*120:450+rnd()*90,dep:rnd()<.8?930+(rnd()+rnd()+rnd())/3*60:840+rnd()*240,st:'away'}));
 function stepCars(){for(const c of cars){
   if(c.st==='away'&&!c.done&&clock>=c.arr&&clock<c.dep){c.st='moving';const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg in',what:'–',order:'–'});go(v,c.sl.path);call(v,()=>{c.st='parked';kill(v)})}
   else if(c.st==='parked'&&clock>=c.dep){c.st='moving';c.done=true;const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg hem',what:'–',order:'–',x:c.sl.x,y:c.sl.y,ang:c.sl.a,ta:c.sl.a});go(v,c.sl.path.slice(0,-1).reverse().concat([START]));call(v,()=>{c.st='away';kill(v)})}}}
-function step(dt){const night=(clock>1050||clock<400)&&!vehicles.length&&!jobs.length;clock+=dt*CLOCK*(night?15:1);
+function step(dt){const night=(clock>1110||clock<290)&&!vehicles.length&&!jobs.length;clock+=dt*CLOCK*(night?15:1);
  if(clock>=1440){clock-=1440;stat={inn:0,pack:0,out:0};cars.forEach(c=>c.done=false);buildSchedule(0)}
  while(sched.length&&sched[0].t<=clock)sched.shift().fn();stepCars();
  traffic(dt);for(const f of forks){if(!f.busy&&jobs.length&&!f.retire)assign(f,jobs.shift());stepV(f,dt)}
@@ -193,36 +194,41 @@ function ground(){ctx.fillStyle='#927c62';ctx.fillRect(0,0,W,H);
  const fp=[];for(let x=-200;x<=260;x+=3)fp.push([x,fEdge(x)]);poly(wp(fp.concat([[260,-300],[-200,-300]])),'#3f5236');
  poly(wp([[99,12],[260,12],[260,300],[130,162],[88,106],[90,80],[92,70],[95,45],[99,40]]),'#6f9450');
  poly(wp([[17,12.5],[33,10.5],[34,5.5],[81,5.5],[82,12.5],[99,13.5],[99,40],[95,45],[92,70],[90,80],[88,106],[82,98],[65,72],[47,52],[39,47],[27.5,39.5],[12,26.5]]),'#77787b');
- for(const q of[[84.5,14.5,96,35],[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8],[20,13,32,22]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');
+ for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8],[20,13,32,22]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');
  poly(wp(ribbon(ROAD,1.7)),'#68696b');
- ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1;ctx.beginPath();for(const s of SLOTS){const c=Math.cos(s.a),n=Math.sin(s.a);for(const k of[-1,1]){const a=P(s.x-n*.9*k-c*1.35,s.y+c*.9*k-n*1.35),b=P(s.x-n*.9*k+c*1.35,s.y+c*.9*k+n*1.35);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}}ctx.stroke();
- const s=S*zoom;for(const t of TREES){const p=P(t[0],t[1],t[2]);if(p[0]<-30||p[0]>W+30||p[1]<-30||p[1]>H+30)continue;ctx.fillStyle=t[3]<.5?'#2f4429':'#39502f';ctx.beginPath();ctx.arc(p[0],p[1],t[2]*s*1.1,0,7);ctx.fill();ctx.fillStyle=t[3]<.5?'#46633a':'#517041';ctx.beginPath();ctx.arc(p[0]-t[2]*s*.25,p[1]-t[2]*s*.35,t[2]*s*.6,0,7);ctx.fill()}}
+
+ const s=S*zoom;for(const t of TREES){const p=P(t[0],t[1],t[2]);if(p[0]<-30||p[0]>W+30||p[1]<-30||p[1]>H+30)continue;ctx.fillStyle=t[3]<.5?'#2f4429':'#39502f';ctx.beginPath();ctx.arc(p[0],p[1],t[2]*s*1.1,0,7);ctx.fill();ctx.fillStyle=t[3]<.5?'#46633a':'#517041';ctx.beginPath();ctx.arc(p[0]-t[2]*s*.25,p[1]-t[2]*s*.35,t[2]*s*.6,0,7);ctx.fill()}
+ {const [a,b,c,d]=PAD,CON=[150,148,142];poly(wp([[a,b,0],[a,d,0],[a,d,PADZ],[a,b,PADZ]]),col(CON,.72));poly(wp([[a,d,0],[c,d,0],[c,d,PADZ],[a,d,PADZ]]),col(CON,.88));
+  poly(wp([[a,b,PADZ],[c,b,PADZ],[c,d,PADZ],[a,d,PADZ]]),'#707174');poly(wp([[86,d,PADZ],[92,d,PADZ],[92,39.5,0],[86,39.5,0]]),'#7c7d80');poly(wp([[86,d,0],[86,d,PADZ],[86,39.5,0]]),col(CON,.72))}
+ ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1;ctx.beginPath();for(const s of SLOTS){zOff=groundZ(s.x,s.y);const c=Math.cos(s.a),n=Math.sin(s.a);for(const k of[-1,1]){const a=P(s.x-n*.9*k-c*1.35,s.y+c*.9*k-n*1.35),b=P(s.x-n*.9*k+c*1.35,s.y+c*.9*k+n*1.35);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}}zOff=0;ctx.stroke();}
 function render(){ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ground();const D=[],s=S*zoom;
- if(sel&&sel.v&&sel.v.sx>-900){const p=P(sel.v.x,sel.v.y);ctx.strokeStyle='#ff8a3c';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p[0],p[1],3*s,1.5*s,0,0,7);ctx.stroke()}
+ if(sel&&sel.v&&sel.v.sx>-900){zOff=groundZ(sel.v.x,sel.v.y);const p=P(sel.v.x,sel.v.y);zOff=0;ctx.strokeStyle='#ff8a3c';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p[0],p[1],3*s,1.5*s,0,0,7);ctx.stroke()}
  B.forEach(b=>D.push({k:b.cy-b.cx,f:()=>drawB(b)}));
- GOODS.forEach(g=>D.push({k:g[1]-g[0],f:()=>g[2]==='cyl'?vcyl(g[0],g[1],0,g[4],g[5],[205,210,214]):cargo(g[2],g[0],g[1],g[3],0)}));
+ GOODS.forEach(g=>D.push({k:g[1]-g[0],f:()=>{zOff=groundZ(g[0],g[1]);g[2]==='cyl'?vcyl(g[0],g[1],0,g[4],g[5],[205,210,214]):cargo(g[2],g[0],g[1],g[3],0);zOff=0}}));
  GUEST.forEach(g=>D.push({k:g[1]-g[0]+9,f:()=>{obox(g[0],g[1],2.5,1.15,.2,.75,1.57,[232,234,236]);obox(g[0],g[1],1.3,1,.75,1.2,1.57,[58,68,80])}}));
- cars.forEach(c=>{if(c.st==='parked')D.push({k:c.sl.y-c.sl.x,f:()=>{obox(c.sl.x,c.sl.y,2.5,1.15,.2,.75,c.sl.a,c.col);obox(c.sl.x,c.sl.y,1.3,1,.75,1.2,c.sl.a,[58,68,80])}})});
- forks.concat(vehicles).forEach(v=>{if(v.kind==='rig'){rigParts(v,D);return}if(inB(v.x,v.y)){v.sx=-999;return}D.push({k:v.y-v.x,f:()=>drawV(v)})});
+ cars.forEach(c=>{if(c.st==='parked')D.push({k:c.sl.y-c.sl.x,f:()=>{zOff=groundZ(c.sl.x,c.sl.y);obox(c.sl.x,c.sl.y,2.5,1.15,.2,.75,c.sl.a,c.col);obox(c.sl.x,c.sl.y,1.3,1,.75,1.2,c.sl.a,[58,68,80]);zOff=0}})});
+ forks.concat(vehicles).forEach(v=>{if(v.kind==='rig'){rigParts(v,D);return}if(inB(v.x,v.y)){v.sx=-999;return}D.push({k:v.y-v.x,f:()=>{zOff=groundZ(v.x,v.y);drawV(v);zOff=0}})});
  D.sort((a,b)=>a.k-b.k).forEach(d=>d.f());
  if($('labels').checked){ctx.font=`600 ${Math.max(11,Math.min(15,s*1.9))}px 'Barlow Condensed','Arial Narrow',sans-serif`;ctx.textBaseline='middle';
   ctx.textAlign='center';for(const t of TAGS){const p=P(t[1],t[2]),w=ctx.measureText(t[0]).width+10;ctx.fillStyle='rgba(255,255,255,.16)';ctx.beginPath();ctx.roundRect(p[0]-w/2,p[1]-8,w,16,2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText(t[0],p[0],p[1]+1)}
   for(const b of B){const Q=(x,y,z)=>{const q=R(b,x,y);return P(q[0],q[1],z)};
    for(const d of b.doors||[]){const p=d.s!=null?Q(d.s,b.y+b.d,(d.z||3)-.5):Q(b.x,d.w,(d.z||3)-.5),t='Port '+d.n,w=ctx.measureText(t).width+8;ctx.fillStyle='#1f5fae';ctx.beginPath();ctx.roundRect(p[0]-w/2,p[1]-8,w,16,2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(t,p[0],p[1]+1)}
-   if(b.sign){const p=Q(b.x,b.cy,b.h-1.15);ctx.fillStyle='#1f3f7a';ctx.fillText('TOMAL',p[0],p[1]+1)}
-   if(!b.lab)continue;const p=P(b.cx,b.cy,b.h+(b.g||0)+.8),w=ctx.measureText(b.n).width+14;ctx.fillStyle='rgba(16,23,29,.84)';ctx.beginPath();ctx.roundRect(p[0]-w/2,p[1]-10,w,20,3);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(b.n,p[0],p[1]+1)}}
+   if(b.sign){const p=Q(b.x,b.cy,b.h-1.15),q=Q(b.x,b.cy+1,b.h-1.15),ux=q[0]-p[0],uy=q[1]-p[1],L=Math.hypot(ux,uy);ctx.save();ctx.translate(p[0],p[1]);ctx.transform(ux/L,uy/L,0,1,0,0);ctx.font=`700 ${(S*zoom*.85).toFixed(1)}px 'Barlow Condensed','Arial Narrow',sans-serif`;ctx.fillStyle='#1f3f7a';ctx.fillText('TOMAL',0,1);ctx.restore()}
+   if(!b.lab)continue;const p=P(b.cx+(b.lx||0),b.cy,b.h+(b.g||0)+.8),w=ctx.measureText(b.n).width+14;ctx.fillStyle='rgba(16,23,29,.84)';ctx.beginPath();ctx.roundRect(p[0]-w/2,p[1]-10,w,20,3);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(b.n,p[0],p[1]+1)}}
  const h=clock/60,n=h<5||h>21?.52:h<7?.52*(7-h)/2:h>17?.52*(h-17)/4:0;if(n>0){ctx.fillStyle=`rgba(12,22,52,${n})`;ctx.fillRect(0,0,W,H)}}
-function info(){const el=$('info');if(!sel){el.innerHTML='<p>Klicka på en truck, lastbil eller byggnad.</p>';return}
- const rows=[];let title;
+function info(){const el=$('info');if(!sel){el.hidden=true;return}el.hidden=false;
+ const rows=[];let title,txt='';
  if(sel.v){const v=sel.v;title=v.name;rows.push(['Status',v.status],['Last',v.kind==='fork'?(v.cargo?CNAME[v.cargo]:'–'):v.what],['Order',v.order])}
- else{const b=sel.b;title=b.n;rows.push(['Funktion',b.txt]);if(b.doors)rows.push(['Portar',b.doors.map(d=>'Port '+d.n).join(', ')]);
+ else{const b=sel.b;title=b.n;txt=b.txt;if(b.doors)rows.push(['Portar',b.doors.map(d=>'Port '+d.n).join(', ')]);
   if(b.k==='gods')rows.push(['I dag',stat.inn+' kolli mottagna']);if(b.k==='prov')rows.push(['I dag',stat.pack+' maskiner provade och flyttade']);
   if(b.k==='pack')rows.push(['Väntar på frakt',packStock+' maskiner']);if(b.k==='silo')rows.push(['I hallen',hall8+' silos']);}
- el.innerHTML='<h3></h3><dl></dl>';el.firstChild.textContent=title;const dl=el.lastChild;rows.forEach(r=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=r[0];dd.textContent=r[1];dl.append(dt,dd)})}
-let uiT=0;function ui(){const c=hhmm(clock);if($('clock').textContent!==c){$('clock').textContent=c;if(document.activeElement!==$('tod')){$('tod').value=clock|0;$('todO').textContent=c}}
- const h=clock/60;$('phase').textContent=h<6.5?'Natt, gården är tom':h<9?'Morgon, personalen anländer':h<15?'Full drift':h<17.2?'Eftermiddag, personalen åker hem':'Kväll';
+ el.innerHTML='<h3></h3><p></p><dl></dl>';el.children[0].textContent=title;el.children[1].textContent=txt;el.children[1].hidden=!txt;const dl=el.children[2];rows.forEach(r=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=r[0];dd.textContent=r[1];dl.append(dt,dd)})}
+let uiT=0,tourT=0,tourI=-1,tourHold=0;const TOUR=B.filter(b=>b.lab&&b.txt);
+function tourStep(t){if(!$('tour').checked||t<tourHold||t-tourT<10000)return;tourT=t;tourI=(tourI+1)%TOUR.length;sel={b:TOUR[tourI]};info()}
+function ui(t){tourStep(t||0);const c=hhmm(clock);if($('clock').textContent!==c){$('clock').textContent=c;if(document.activeElement!==$('tod')){$('tod').value=clock|0;$('todO').textContent=c}}
+ const h=clock/60;$('phase').textContent=h<5?'Natt, gården är tom':h<9?'Morgon, personalen anländer':h<10?'Förmiddag':h<15?'Leveranser och full drift':h<15.5?'Eftermiddag':h<17?'Personalen åker hem':h<18.5?'Kväll':'Natt, gården är tom';
  $('kInn').textContent=stat.inn;$('kPack').textContent=stat.pack;$('kOut').textContent=stat.out;$('kSilo').textContent=hall8;$('kCars').textContent=cars.filter(c=>c.st==='parked').length;$('kJobs').textContent=jobs.length;if(sel)info()}
-let last=performance.now();function frame(t){const dt=Math.min(.1,(t-last)/1000);last=t;if(speed){let r=dt*speed;while(r>0){const d=Math.min(.05,r);step(d);r-=d}}render();if(t-uiT>250){uiT=t;ui()}requestAnimationFrame(frame)}
+let last=performance.now();function frame(t){const dt=Math.min(.1,(t-last)/1000);last=t;if(speed){let r=dt*speed;while(r>0){const d=Math.min(.05,r);step(d);r-=d}}render();if(t-uiT>250){uiT=t;ui(t)}requestAnimationFrame(frame)}
 function resize(){const r=$('stage').getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);cv.width=W*devicePixelRatio;cv.height=H*devicePixelRatio;S=Math.min(W/128,H/62)}
 new ResizeObserver(resize).observe($('stage'));
 
@@ -232,15 +238,24 @@ cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:panX,py:p
 cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.m=Math.max(drag.m,Math.hypot(dx,dy));panX=drag.px+dx;panY=drag.py+dy});
 cv.addEventListener('pointerup',e=>{cv.style.cursor='grab';const d=drag;drag=null;if(!d||d.m>5)return;const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
  let best=null,bd=26;for(const v of forks.concat(vehicles)){if(v.sx==null||v.sx<-900)continue;const q=Math.hypot(v.sx-mx,v.sy-my);if(q<bd){bd=q;best=v}}
- if(best)sel={v:best};else{sel=null;const hit=B.slice().sort((a,b)=>(b.cy-b.cx)-(a.cy-a.cx)).find(b=>b.polys&&b.polys.some(p=>{let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if((p[i][1]>my)!==(p[j][1]>my)&&mx<(p[j][0]-p[i][0])*(my-p[i][1])/(p[j][1]-p[i][1])+p[i][0])c=!c}return c}));if(hit)sel={b:hit}}info()});
+ if(best)sel={v:best};else{sel=null;const hit=B.slice().sort((a,b)=>(b.cy-b.cx)-(a.cy-a.cx)).find(b=>b.polys&&b.polys.some(p=>{let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if((p[i][1]>my)!==(p[j][1]>my)&&mx<(p[j][0]-p[i][0])*(my-p[i][1])/(p[j][1]-p[i][1])+p[i][0])c=!c}return c}));if(hit)sel={b:hit}}tourHold=performance.now()+30000;info()});
 function zoomBy(f,cx=W/2,cy=H/2){const z=Math.max(.6,Math.min(5,zoom*f)),k=z/zoom;panX=(panX+W/2-cx)*k-(W/2-cx);panY=(panY+H/2-cy)*k-(H/2-cy);zoom=z}
 cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomBy(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
 $('zin').onclick=()=>zoomBy(1.3);$('zout').onclick=()=>zoomBy(.77);$('zfit').onclick=()=>{zoom=1;panX=panY=0};
-$('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;speed=+b.dataset.s;[...$('speed').children].forEach(c=>c.setAttribute('aria-pressed',c===b))};
+const SK_='gardsvy';function save(){try{localStorage.setItem(SK_,JSON.stringify({speed,labels:$('labels').checked,tour:$('tour').checked,nVan:NV(),nOut:NO(),nSilo:NS(),nFork:+$('nFork').value}))}catch(e){}}
+function setSpeed(v){speed=v;[...$('speed').children].forEach(c=>c.setAttribute('aria-pressed',+c.dataset.s===v))}
+$('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;setSpeed(+b.dataset.s);save()};
 $('tod').oninput=e=>{$('todO').textContent=hhmm(+e.target.value);resetTo(+e.target.value)};
-$('nFork').oninput=e=>{$('nForkO').textContent=e.target.value;setForks(+e.target.value)};
-for(const id of['nVan','nOut','nSilo'])$(id).oninput=e=>{$(id+'O').textContent=e.target.value;buildSchedule(clock)};
+$('nFork').oninput=e=>{$('nForkO').textContent=e.target.value;setForks(+e.target.value);save()};
+for(const id of['nVan','nOut','nSilo'])$(id).oninput=e=>{$(id+'O').textContent=e.target.value;buildSchedule(clock);save()};
+$('labels').onchange=save;$('tour').onchange=()=>{tourT=0;tourHold=0;if(!$('tour').checked){sel=null;info()}save()};
 $('bVan').onclick=spawnVan;$('bPlat').onclick=spawnPlat;$('bOut').onclick=spawnOut;$('bSiloIn').onclick=()=>silo(1);$('bSiloOut').onclick=()=>{if(hall8<1)log('Ingen färdig silo i silohallen att hämta');silo(0)};$('bMove').onclick=machineMove;
-
-resize();resetTo(445);spawnVan();machineMove();spawnOut();for(let i=0;i<240;i++)step(.05);ui();requestAnimationFrame(frame);
+function panel(open){$('panel').hidden=!open;$('bSet').setAttribute('aria-expanded',open)}
+$('bSet').onclick=()=>panel($('panel').hidden);$('bClose').onclick=()=>panel(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')panel(false)});
+$('bFull').onclick=()=>{const d=document;try{if(d.fullscreenElement)d.exitFullscreen();else{const p=d.documentElement.requestFullscreen();p&&p.catch(()=>{})}}catch(e){}};
+document.addEventListener('fullscreenchange',()=>{$('bFull').textContent=document.fullscreenElement?'Avsluta helskärm':'Helskärm'});
+let idleT=0;const wake=()=>{$('app').classList.remove('idle');clearTimeout(idleT);idleT=setTimeout(()=>$('app').classList.add('idle'),4000)};['pointermove','pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,wake));wake();
+try{const c=JSON.parse(localStorage.getItem(SK_)||'null');if(c){setSpeed(c.speed??1);$('labels').checked=c.labels!==false;$('tour').checked=!!c.tour;for(const k of['nVan','nOut','nSilo','nFork'])if(c[k]!=null){$(k).value=c[k];$(k+'O').textContent=$(k).value}}}catch(e){}
+{const n=new Date();resize();resetTo(n.getHours()*60+n.getMinutes());$('tod').value=clock;for(let i=0;i<240;i++)step(.05);ui(0);requestAnimationFrame(frame)}
 })();
