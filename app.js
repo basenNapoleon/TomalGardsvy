@@ -90,12 +90,16 @@ function drawB(b){const x=b.x,y=b.y,x1=x+b.w,y1=y+b.d,h=b.h,ym=y+b.d/2,xm=x+b.w/
 
 /* ---------- fordon ---------- */
 function drawV(v){const a=v.ang,x=v.x,y=v.y,parts=[];const add=(p,f)=>parts.push([p[1]-p[0],f]);
- const sh=P(x,y),s=S*zoom;ctx.fillStyle='rgba(20,25,30,.2)';ctx.beginPath();ctx.ellipse(sh[0],sh[1],(v.kind==='truck'?4.2:1.6)*s,(v.kind==='truck'?2:.8)*s,0,0,7);ctx.fill();
+ const sh=P(x,y),s=S*zoom;ctx.fillStyle='rgba(20,25,30,.2)';ctx.beginPath();ctx.ellipse(sh[0],sh[1],(v.kind==='truck'?4.2:v.kind==='combine'?3:1.6)*s,(v.kind==='truck'?2:v.kind==='combine'?1.5:.8)*s,0,0,7);ctx.fill();
  if(v.kind==='fork'){add([x,y],()=>{obox(x,y,1.7,1.15,.25,1.15,a,[236,124,26]);const g=off(x,y,a,-.15);obox(g[0],g[1],1,1,1.9,2,a,[52,57,63])});
   const m=off(x,y,a,.95);add(m,()=>obox(m[0],m[1],.16,1,0,2.3,a,[58,63,69]));if(v.cargo){const c=off(x,y,a,1.9);add(c,()=>cargo(v.cargo,c[0],c[1],a,.3))}}
  else if(v.kind==='car'){add([x,y],()=>{obox(x,y,2.5,1.15,.2,.75,a,v.col);const c=off(x,y,a,-.15);obox(c[0],c[1],1.3,1,.75,1.2,a,[58,68,80])})}
  else if(v.kind==='van'){const b=off(x,y,a,-.35),c=off(x,y,a,1.35);add(b,()=>obox(b[0],b[1],2.5,1.45,.25,1.95,a,v.col));add(c,()=>obox(c[0],c[1],.9,1.4,.25,1.5,a,[v.col[0]*.85,v.col[1]*.85,v.col[2]*.85]))}
  else if(v.kind==='truck'){const c=off(x,y,a,3.1),b=off(x,y,a,-.7);add(c,()=>obox(c[0],c[1],1.5,1.6,.3,2.3,a,v.col));add(b,()=>{obox(b[0],b[1],6,1.6,.7,.95,a,[72,77,83]);for(let i=0;i<v.load;i++){const q=off(x,y,a,1.3-i*1.9);cargo(v.ctype,q[0],q[1],a,.95)}})}
+ else if(v.kind==='combine'){const G=[62,128,58],h=off(x,y,a,2.7),c=off(x,y,a,1.1),t=off(x,y,a,-.9);
+  add(h,()=>{obox(h[0],h[1],.9,4.4,.3,.95,a,[214,178,48])});
+  add([x,y],()=>{obox(x,y,4,2.2,.4,2.1,a,G);obox(t[0],t[1],1.7,1.9,2.1,2.9,a,G);const u=off(x,y,a,-.6,1.6);obox(u[0],u[1],.35,1.9,2.6,2.8,a,[90,96,100])});
+  add(c,()=>obox(c[0],c[1],1.2,1.4,2.1,3.2,a,[150,190,205]))}
  parts.sort((p,q)=>p[0]-q[0]).forEach(p=>p[1]());v.sx=sh[0];v.sy=sh[1]-s*.8}
 function behind(v,D){let px=v.x,py=v.y,acc=0;for(let i=v.trail.length-1;i>=0;i--){const q=v.trail[i],d=Math.hypot(px-q[0],py-q[1]);if(acc+d>=D){const t=(D-acc)/(d||1);return[px+(q[0]-px)*t,py+(q[1]-py)*t]}acc+=d;px=q[0];py=q[1]}return[px,py]}
 function seedTrail(v,a){v.trail=[];for(let i=60;i>=1;i--)v.trail.push([v.x-Math.cos(a)*i*.4,v.y-Math.sin(a)*i*.4])}
@@ -171,26 +175,35 @@ function silo(inb){if(rigBusy){later(()=>silo(inb),40);return}if(!inb&&hall8<1)r
  call(v,()=>{v.status=inb?'Lossar i silohallen':'Lastar färdig silo';if(inb){hall8++;v.loaded=null}});wait(v,35);
  call(v,()=>{if(!inb){hall8--;v.loaded='klar';v.what='Silo 30 m, el och isolering klar';log('Färdig silo lämnar silohallen mot kund')}else log('Silo avlastad i silohallen');v.status='Lämnar gården';v.x=X[0];v.y=X[1];v.ang=v.ta=Math.PI+HK;seedTrail(v,Math.PI+HK)});
  go(v,[F,[57,59.6],[53,56.7],[47,50],[39,45],[27.5,37.5],[0,15],[-45,-23.3]]);call(v,()=>{rigBusy=false;kill(v)})}
+let farm=[],stubble=[];
+function harvest(){if(farm.length)return;const c0=17+rnd()*5,n=4+(rnd()*3|0),X0=-4,X1=74,W2=3.2;
+ const v={kind:'combine',id:'S1',name:'Skördetröska',status:'Tröskar på grannens åker',what:'Spannmål',order:'–',x:-30,y:-30+c0,ang:Math.PI/4,ta:Math.PI/4,q:[],sp:2.6,lane:0,cur:null};farm.push(v);log('Skördetröskan kör ut på åkern');
+ go(v,[[X0,X0+c0]]);for(let k=0;k<n;k++){const c=c0+k*W2,fw=k%2===0,xa=fw?X0:X1,xb=fw?X1:X0;
+  call(v,()=>{v.cur={c,xa}});go(v,[[xb,xb+c]]);call(v,()=>{stubble.push([c,Math.min(xa,xb),Math.max(xa,xb)]);v.cur=null});
+  if(k<n-1){const e=fw?3:-3,cn=c+W2;go(v,[[xb+e,xb+e+c+W2/2],[xb,xb+cn]])}}
+ const last=c0+(n-1)*W2;go(v,[[-40,-40+last]]);call(v,()=>{farm=farm.filter(u=>u!==v);v.status='Klar';if(sel&&sel.v===v){sel=null;info()}})}
 const NV=()=>+$('nVan').value,NO=()=>+$('nOut').value,NS=()=>+$('nSilo').value;
 function buildSchedule(from){sched=[];const add=(t,fn)=>{if(t>from)sched.push({t,fn})};
  for(let i=0;i<NV();i++)add(600+rnd()*300,spawnVan);for(let i=0;i<1+(rnd()<.5);i++)add(600+rnd()*270,spawnPlat);
  for(let i=0;i<NO();i++)add(600+rnd()*300,spawnOut);for(let i=0;i<NS();i++){add(600+rnd()*180,()=>silo(1));add(790+rnd()*110,()=>silo(0))}
- for(let t=430+rnd()*30;t<940;t+=40+rnd()*35)add(t,machineMove);sched.sort((a,b)=>a.t-b.t)}
-function resetTo(t){clock=t;vehicles=[];jobs=[];rigBusy=false;sel=null;SPOTS.forEach(s=>s.busy=false);TS4.busy=TS7.busy=false;stat={inn:0,pack:0,out:0};
+ for(let t=430+rnd()*30;t<940;t+=40+rnd()*35)add(t,machineMove);if(rnd()<.85)add(480+rnd()*420,harvest);if(rnd()<.4)add(600+rnd()*360,harvest);sched.sort((a,b)=>a.t-b.t)}
+function resetTo(t){clock=t;vehicles=[];farm=[];stubble=[];if(t>540&&t<1000&&rnd()<.5)later(harvest,1);jobs=[];rigBusy=false;sel=null;SPOTS.forEach(s=>s.busy=false);TS4.busy=TS7.busy=false;stat={inn:0,pack:0,out:0};
  forks=[];setForks(+$('nFork').value);cars.forEach(c=>{c.st=t>=c.arr&&t<c.dep?'parked':'away';c.done=t>=c.dep});buildSchedule(t);$('log').innerHTML='';info()}
 cars=SLOTS.map(sl=>({sl,col:pick(CARCOL),arr:rnd()<.85?330+(rnd()+rnd()+rnd())/3*120:450+rnd()*90,dep:rnd()<.55?900+(rnd()+rnd())/2*120:780+rnd()*330,st:'away'}));
 function stepCars(){for(const c of cars){
   if(c.st==='away'&&!c.done&&clock>=c.arr&&clock<c.dep){c.st='moving';const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg in',what:'–',order:'–'});go(v,c.sl.path);call(v,()=>{c.st='parked';kill(v)})}
   else if(c.st==='parked'&&clock>=c.dep){c.st='moving';c.done=true;const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg hem',what:'–',order:'–',x:c.sl.x,y:c.sl.y,ang:c.sl.a,ta:c.sl.a});go(v,c.sl.path.slice(0,-1).reverse().concat([START]));call(v,()=>{c.st='away';kill(v)})}}}
-function step(dt){const night=(clock>1110||clock<290)&&!vehicles.length&&!jobs.length;clock+=dt*CLOCK*(night?15:1);
- if(clock>=1440){clock-=1440;stat={inn:0,pack:0,out:0};cars.forEach(c=>c.done=false);buildSchedule(0)}
+function step(dt){const night=(clock>1110||clock<290)&&!vehicles.length&&!farm.length&&!jobs.length;clock+=dt*CLOCK*(night?15:1);
+ if(clock>=1440){clock-=1440;stubble=[];stat={inn:0,pack:0,out:0};cars.forEach(c=>c.done=false);buildSchedule(0)}
  while(sched.length&&sched[0].t<=clock)sched.shift().fn();stepCars();
  traffic(dt);for(const f of forks){if(!f.busy&&jobs.length&&!f.retire)assign(f,jobs.shift());stepV(f,dt)}
- forks=forks.filter(f=>!(f.retire&&!f.busy));for(const v of vehicles.slice())stepV(v,dt)}
+ forks=forks.filter(f=>!(f.retire&&!f.busy));for(const v of vehicles.slice())stepV(v,dt);for(const v of farm.slice())stepV(v,dt)}
 
 /* ---------- rendering ---------- */
 function ground(){ctx.fillStyle='#927c62';ctx.fillRect(0,0,W,H);
- ctx.save();poly(wp(ROAD.concat([[140,400],[-300,400],[-300,-36]])));ctx.clip();ctx.strokeStyle='rgba(60,45,30,.16)';ctx.lineWidth=1;ctx.beginPath();for(let c=-40;c<140;c+=1.5){const a=P(-200,c-200),b=P(300,c+300);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}ctx.stroke();ctx.restore();
+ ctx.save();poly(wp(ROAD.concat([[140,400],[-300,400],[-300,-36]])));ctx.clip();ctx.strokeStyle='rgba(60,45,30,.16)';ctx.lineWidth=1;ctx.beginPath();for(let c=-40;c<140;c+=1.5){const a=P(-200,c-200),b=P(300,c+300);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}ctx.stroke();
+ ctx.fillStyle='rgba(204,178,122,.55)';const band=(c,a,b)=>poly(wp([[a,a+c-1.6],[b,b+c-1.6],[b,b+c+1.6],[a,a+c+1.6]]),'rgba(204,178,122,.55)');
+ for(const t of stubble)band(t[0],t[1],t[2]);for(const v of farm)if(v.cur)band(v.cur.c,Math.min(v.cur.xa,v.x),Math.max(v.cur.xa,v.x));ctx.restore();
  const fp=[];for(let x=-200;x<=260;x+=3)fp.push([x,fEdge(x)]);poly(wp(fp.concat([[260,-300],[-200,-300]])),'#3f5236');
  poly(wp([[99,12],[260,12],[260,300],[130,162],[88,106],[90,80],[92,70],[95,45],[99,40]]),'#6f9450');
  poly(wp([[17,12.5],[33,10.5],[34,5.5],[81,5.5],[82,12.5],[99,13.5],[99,40],[95,45],[92,70],[90,80],[88,106],[82,98],[65,72],[47,52],[39,47],[27.5,39.5],[12,26.5]]),'#77787b');
@@ -207,7 +220,7 @@ function render(){ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);gr
  GOODS.forEach(g=>D.push({k:g[1]-g[0],f:()=>{zOff=groundZ(g[0],g[1]);g[2]==='cyl'?vcyl(g[0],g[1],0,g[4],g[5],[205,210,214]):cargo(g[2],g[0],g[1],g[3],0);zOff=0}}));
  GUEST.forEach(g=>D.push({k:g[1]-g[0]+9,f:()=>{obox(g[0],g[1],2.5,1.15,.2,.75,1.57,[232,234,236]);obox(g[0],g[1],1.3,1,.75,1.2,1.57,[58,68,80])}}));
  cars.forEach(c=>{if(c.st==='parked')D.push({k:c.sl.y-c.sl.x,f:()=>{zOff=groundZ(c.sl.x,c.sl.y);obox(c.sl.x,c.sl.y,2.5,1.15,.2,.75,c.sl.a,c.col);obox(c.sl.x,c.sl.y,1.3,1,.75,1.2,c.sl.a,[58,68,80]);zOff=0}})});
- forks.concat(vehicles).forEach(v=>{if(v.kind==='rig'){rigParts(v,D);return}if(inB(v.x,v.y)){v.sx=-999;return}D.push({k:v.y-v.x,f:()=>{zOff=groundZ(v.x,v.y);drawV(v);zOff=0}})});
+ forks.concat(vehicles,farm).forEach(v=>{if(v.kind==='rig'){rigParts(v,D);return}if(inB(v.x,v.y)){v.sx=-999;return}D.push({k:v.y-v.x,f:()=>{zOff=groundZ(v.x,v.y);drawV(v);zOff=0}})});
  D.sort((a,b)=>a.k-b.k).forEach(d=>d.f());
  if($('labels').checked){ctx.font=`600 ${Math.max(11,Math.min(15,s*1.9))}px 'Barlow Condensed','Arial Narrow',sans-serif`;ctx.textBaseline='middle';
   ctx.textAlign='center';for(const t of TAGS){const p=P(t[1],t[2]),w=ctx.measureText(t[0]).width+10;ctx.fillStyle='rgba(255,255,255,.16)';ctx.beginPath();ctx.roundRect(p[0]-w/2,p[1]-8,w,16,2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText(t[0],p[0],p[1]+1)}
@@ -237,7 +250,7 @@ let drag=null;
 cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:panX,py:panY,m:0};cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing'});
 cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.m=Math.max(drag.m,Math.hypot(dx,dy));panX=drag.px+dx;panY=drag.py+dy});
 cv.addEventListener('pointerup',e=>{cv.style.cursor='grab';const d=drag;drag=null;if(!d||d.m>5)return;const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
- let best=null,bd=26;for(const v of forks.concat(vehicles)){if(v.sx==null||v.sx<-900)continue;const q=Math.hypot(v.sx-mx,v.sy-my);if(q<bd){bd=q;best=v}}
+ let best=null,bd=26;for(const v of forks.concat(vehicles,farm)){if(v.sx==null||v.sx<-900)continue;const q=Math.hypot(v.sx-mx,v.sy-my);if(q<bd){bd=q;best=v}}
  if(best)sel={v:best};else{sel=null;const hit=B.slice().sort((a,b)=>(b.cy-b.cx)-(a.cy-a.cx)).find(b=>b.polys&&b.polys.some(p=>{let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if((p[i][1]>my)!==(p[j][1]>my)&&mx<(p[j][0]-p[i][0])*(my-p[i][1])/(p[j][1]-p[i][1])+p[i][0])c=!c}return c}));if(hit)sel={b:hit}}tourHold=performance.now()+30000;info()});
 function zoomBy(f,cx=W/2,cy=H/2){const z=Math.max(.6,Math.min(5,zoom*f)),k=z/zoom;panX=(panX+W/2-cx)*k-(W/2-cx);panY=(panY+H/2-cy)*k-(H/2-cy);zoom=z}
 cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomBy(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
@@ -249,7 +262,7 @@ $('tod').oninput=e=>{$('todO').textContent=hhmm(+e.target.value);resetTo(+e.targ
 $('nFork').oninput=e=>{$('nForkO').textContent=e.target.value;setForks(+e.target.value);save()};
 for(const id of['nVan','nOut','nSilo'])$(id).oninput=e=>{$(id+'O').textContent=e.target.value;buildSchedule(clock);save()};
 $('labels').onchange=save;$('tour').onchange=()=>{tourT=0;tourHold=0;if(!$('tour').checked){sel=null;info()}save()};
-$('bVan').onclick=spawnVan;$('bPlat').onclick=spawnPlat;$('bOut').onclick=spawnOut;$('bSiloIn').onclick=()=>silo(1);$('bSiloOut').onclick=()=>{if(hall8<1)log('Ingen färdig silo i silohallen att hämta');silo(0)};$('bMove').onclick=machineMove;
+$('bVan').onclick=spawnVan;$('bPlat').onclick=spawnPlat;$('bOut').onclick=spawnOut;$('bSiloIn').onclick=()=>silo(1);$('bSiloOut').onclick=()=>{if(hall8<1)log('Ingen färdig silo i silohallen att hämta');silo(0)};$('bMove').onclick=machineMove;$('bHarv').onclick=harvest;
 function panel(open){$('panel').hidden=!open;$('bSet').setAttribute('aria-expanded',open)}
 $('bSet').onclick=()=>panel($('panel').hidden);$('bClose').onclick=()=>panel(false);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')panel(false)});
