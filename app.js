@@ -24,7 +24,9 @@ const B=[
  {k:'lagers',n:'Lager',x:45.5,y:21.5,w:8.5,d:5.3,h:3,wall:OFF,roof:[70,72,76],win:1,lab:1,txt:'Lager intill svetsen.'},
  {k:'kontor',n:'Kontor',x:25,y:27,w:8.5,d:5,h:3.2,g:3,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Tjänstemännen sitter här.'},
  {k:'kontor',n:'Kontor',x:36.25,y:28.25,w:6.5,d:3.8,h:2.6,g:2,a:.45,wall:OFF,roof:ROOF,win:1,txt:'Tjänstemännen sitter här.'},
- {k:'entre',n:'Gästingång',x:34.2,y:33,w:2.6,d:2.8,h:2.2,a:SK,wall:[150,186,204],roof:[70,76,84],txt:'Glasad entré för besökare.'},
+ {k:'entre',n:'Ingång',x:33.6,y:32.6,w:3.4,d:3.2,h:2.4,g:1.6,a:SK,wall:OFF,roof:ROOF,win:1,txt:'Ingången för besökare.'},
+ {k:'entre',n:'Ingång',x:34.9,y:35.8,w:1.4,d:1.2,h:1.8,a:SK,wall:[176,204,216],roof:OFF,txt:'Ingången för besökare.'},
+ {k:'vast',n:'',x:26,y:21.5,w:8.5,d:4.5,h:2.6,wall:OFF,roof:[56,58,62],win:1,txt:''},
  {k:'matsal',n:'Matsal',x:43.6,y:27.2,w:4.8,d:5,h:2.8,a:SK,wall:OFF,roof:[70,72,76],win:1,lab:1,txt:'Matsalen, sitter ihop med kontoren.'},
  {k:'kontor',n:'Kontor',lx:4,x:37.5,y:33.3,w:12,d:5.5,h:4.2,g:3.4,a:SK,wall:OFF,roof:ROOF,win:2,lab:1,txt:'Tjänstemännen sitter här. Gästingång på västra sidan, gästparkering framför.'},
  {k:'pack',n:'Packavdelning',x:68,y:40,w:24,d:13,h:4.4,g:2.8,a:HK,wall:BRN,roof:DK,sock:1,lab:1,doors:[{w:43.5,n:1,k:1.5,z:3.3,c:WD},{w:49.5,n:2,k:1.5,z:3.3,c:WD}],txt:'Maskiner packas för frakt. Truckarna kör in via Port 1, kundlastbilar lastas från Port 2. Lager i östra delen.'},
@@ -49,8 +51,8 @@ const dx=.546,dy=.838,SE=RIN.concat([[47,50],[65,70]]);
  for(let r=0;r<2;r++)for(let i=0;i<8;i++){const x=75+1.75*i,y=r?75.5:71.5;SLOTS.push({x,y,a:Math.PI/2,path:SE.concat([[68.9,76],[72.3,74],[x,73.5],[x,y]])})}
  for(let i=0;i<11;i++){if(i===2||i===3)continue;const t=2+2.1*i;SLOTS.push({x:65+dx*t+2.5,y:70+dy*t-1.64,a:Math.atan2(dy,dx)+Math.PI/2,path:SE.concat([[65+dx*t,70+dy*t],[65+dx*t+2.5,70+dy*t-1.64]])})}}
 const GUEST=[[45,40.6],[47,40.6],[49,40.6]];
-const TAGS=[['Gästparkering',48,43],['Parkering',90.5,31],['Parkering',81.5,73.5],['Används ej',26,17.5],['Ingång gäster',32.5,38.8]];
-const GOODS=[[72.5,36.6,'cyl',0,1.1,1.9],[74.6,37.1,'cyl',0,1.2,2.2],[76.6,37.8,'cyl',0,.9,1.7],[70.6,36.2,'cyl',0,.7,1.3],[81.6,23,'cont',1.57],[32.4,19.4,'cyl',0,1.2,6.5,[46,110,196]],[30.6,21,'cyl',0,.8,5,[46,110,196]],[22.5,15,'cont',0],[22.5,16.8,'cont',0],[27,15.2,'cont',0],[63.3,59,'stallning',.2],[63,57.3,'pall',.4],[64.5,55.2,'stallning',.2],[66.9,43.8,'stallning',1.77]];for(let i=0;i<6;i++)GOODS.push([96.4+srnd()*.9,17+i*2.4+srnd()*.5,srnd()<.5?'lada':'pall',srnd()*.4]);
+const TAGS=[['Gästparkering',48,43],['Parkering',90.5,31],['Parkering',81.5,73.5],['Används ej',20.5,20],['Ingång',33.5,39.2]];
+const GOODS=[[72.5,36.6,'cyl',0,1.1,1.9],[74.6,37.1,'cyl',0,1.2,2.2],[76.6,37.8,'cyl',0,.9,1.7],[70.6,36.2,'cyl',0,.7,1.3],[81.6,23,'cont',1.57],[24.6,22.4,'cyl',0,1,6.5,[46,110,196]],[23.1,24,'cyl',0,.75,4,[226,228,230]],[18.2,16,'cont',0],[18.2,17.8,'cont',0],[18.2,19.6,'cont',0],[17.2,24.2,'cont',0],[21.5,26.5,'cont',1.57],[63.3,59,'stallning',.2],[63,57.3,'pall',.4],[64.5,55.2,'stallning',.2],[66.9,43.8,'stallning',1.77]];for(let i=0;i<6;i++)GOODS.push([96.4+srnd()*.9,17+i*2.4+srnd()*.5,srnd()<.5?'lada':'pall',srnd()*.4]);
 
 /* ---------- ritprimitiver ---------- */
 function obox(x,y,L,Wd,z0,z1,a,c){const co=Math.cos(a),si=Math.sin(a),h=[[L/2,Wd/2],[L/2,-Wd/2],[-L/2,-Wd/2],[-L/2,Wd/2]].map(p=>[x+p[0]*co-p[1]*si,y+p[0]*si+p[1]*co]),N=[[co,si],[si,-co],[-co,-si],[-si,co]];
@@ -207,7 +209,7 @@ function ground(){ctx.fillStyle='#927c62';ctx.fillRect(0,0,W,H);
  const fp=[];for(let x=-200;x<=260;x+=3)fp.push([x,fEdge(x)]);poly(wp(fp.concat([[260,-300],[-200,-300]])),'#3f5236');
  poly(wp([[99,12],[260,12],[260,300],[130,162],[88,106],[90,80],[92,70],[95,45],[99,40]]),'#6f9450');
  poly(wp([[17,12.5],[33,10.5],[34,5.5],[81,5.5],[82,12.5],[99,13.5],[99,40],[95,45],[92,70],[90,80],[88,106],[82,98],[65,72],[47,52],[39,47],[27.5,39.5],[12,26.5]]),'#77787b');
- for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8],[20,13,32,22]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');
+ for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');
  poly(wp(ribbon(ROAD,1.7)),'#68696b');
 
  const s=S*zoom;for(const t of TREES){const p=P(t[0],t[1],t[2]);if(p[0]<-30||p[0]>W+30||p[1]<-30||p[1]>H+30)continue;ctx.fillStyle=t[3]<.5?'#2f4429':'#39502f';ctx.beginPath();ctx.arc(p[0],p[1],t[2]*s*1.1,0,7);ctx.fill();ctx.fillStyle=t[3]<.5?'#46633a':'#517041';ctx.beginPath();ctx.arc(p[0]-t[2]*s*.25,p[1]-t[2]*s*.35,t[2]*s*.6,0,7);ctx.fill()}
@@ -251,7 +253,7 @@ cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:panX,py:p
 cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.m=Math.max(drag.m,Math.hypot(dx,dy));panX=drag.px+dx;panY=drag.py+dy});
 cv.addEventListener('pointerup',e=>{cv.style.cursor='grab';const d=drag;drag=null;if(!d||d.m>5)return;const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
  let best=null,bd=26;for(const v of forks.concat(vehicles,farm)){if(v.sx==null||v.sx<-900)continue;const q=Math.hypot(v.sx-mx,v.sy-my);if(q<bd){bd=q;best=v}}
- if(best)sel={v:best};else{sel=null;const hit=B.slice().sort((a,b)=>(b.cy-b.cx)-(a.cy-a.cx)).find(b=>b.polys&&b.polys.some(p=>{let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if((p[i][1]>my)!==(p[j][1]>my)&&mx<(p[j][0]-p[i][0])*(my-p[i][1])/(p[j][1]-p[i][1])+p[i][0])c=!c}return c}));if(hit)sel={b:hit}}tourHold=performance.now()+30000;info()});
+ if(best)sel={v:best};else{sel=null;const hit=B.slice().sort((a,b)=>(b.cy-b.cx)-(a.cy-a.cx)).find(b=>b.n&&b.polys&&b.polys.some(p=>{let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if((p[i][1]>my)!==(p[j][1]>my)&&mx<(p[j][0]-p[i][0])*(my-p[i][1])/(p[j][1]-p[i][1])+p[i][0])c=!c}return c}));if(hit)sel={b:hit}}tourHold=performance.now()+30000;info()});
 function zoomBy(f,cx=W/2,cy=H/2){const z=Math.max(.6,Math.min(5,zoom*f)),k=z/zoom;panX=(panX+W/2-cx)*k-(W/2-cx);panY=(panY+H/2-cy)*k-(H/2-cy);zoom=z}
 cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomBy(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
 $('zin').onclick=()=>zoomBy(1.3);$('zout').onclick=()=>zoomBy(.77);$('zfit').onclick=()=>{zoom=1;panX=panY=0};
