@@ -25,7 +25,7 @@ const B=[
  {k:'lagers',n:'Lager',x:44.4,y:18.2,w:9.6,d:8.6,h:3,wall:OFF,roof:LG,win:1,lab:1,txt:'Lager intill svetsen.'},
  {k:'kontor',n:'Kontor',x:23.5,y:27,w:8.5,d:5,h:3.2,g:3,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Tjänstemännen sitter här.'},
  {k:'kok',n:'Kök',x:37.3,y:26.6,w:2.1,d:2.4,h:2.6,wall:OFF,roof:[60,62,66],txt:'Köket, inklämt mellan matsalen och hallen bakom.'},
- {k:'matsal',n:'Matsal',x:39.4,y:26.6,w:5.85,d:5.8,h:2.8,g:1.8,gy:1,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
+ {k:'matsal',n:'Matsal',x:39.4,y:26.6,w:5.85,d:5.8,h:2.6,g:1.3,shed:1,gy:1,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
  {k:'kontor',n:'Kontor',x:33.9,y:27.9,w:5,d:2.6,h:2.6,g:.8,a:.7,wall:OFF,roof:[150,158,164],win:1,txt:'Kontor.'},
  {k:'kontor',n:'Kontor',x:32.2,y:30.6,w:2.6,d:2.6,h:2.6,g:1.4,wall:OFF,roof:ROOF,win:1,txt:'Kontor.'},
  {k:'entre',n:'Ingång',x:34.8,y:31.5,w:2.5,d:4,h:2.6,g:1.5,gy:1,wall:OFF,roof:ROOF,win:1,txt:'Ingången för besökare.'},
@@ -80,14 +80,15 @@ function cargo(t,x,y,a,z){
 const CNAME={pall:'kolli',plat:'plåtbunt',lada:'packad maskin',skid:'skid',tank:'tank',stallning:'ställning'};
 
 function drawB(b){const x=b.x,y=b.y,x1=x+b.w,y1=y+b.d,h=b.h,ym=y+b.d/2,xm=x+b.w/2,r=b.g||0,gy=b.gy;b.polys=[];const T=a=>a.map(p=>{const q=R(b,p[0],p[1]);return P(q[0],q[1],p[2]||0)});
- const west=r&&!gy?[[x,y,0],[x,y1,0],[x,y1,h],[x,ym,h+r],[x,y,h]]:[[x,y,0],[x,y1,0],[x,y1,h],[x,y,h]];
- const south=r&&gy?[[x,y1,0],[x1,y1,0],[x1,y1,h],[xm,y1,h+r],[x,y1,h]]:[[x,y1,0],[x1,y1,0],[x1,y1,h],[x,y1,h]];
+ const west=b.shed?[[x,y,0],[x,y1,0],[x,y1,h],[x,y,h]]:r&&!gy?[[x,y,0],[x,y1,0],[x,y1,h],[x,ym,h+r],[x,y,h]]:[[x,y,0],[x,y1,0],[x,y1,h],[x,y,h]];
+ const south=b.shed?[[x,y1,0],[x1,y1,0],[x1,y1,h+r],[x,y1,h]]:r&&gy?[[x,y1,0],[x1,y1,0],[x1,y1,h],[xm,y1,h+r],[x,y1,h]]:[[x,y1,0],[x1,y1,0],[x1,y1,h],[x,y1,h]];
  let p=T(west);poly(p,col(b.wall,.72));b.polys.push(p);p=T(south);poly(p,col(b.wall,.88));b.polys.push(p);
  if(b.sock){poly(T([[x,y,0],[x,y1,0],[x,y1,.9],[x,y,.9]]),col(SOCK,.76));poly(T([[x,y1,0],[x1,y1,0],[x1,y1,.9],[x,y1,.9]]),col(SOCK,.92))}
  for(let i=0;i<(b.win||0);i++){const z=1.1+i*2;poly(T([[x+.6,y1,z],[x1-.6,y1,z],[x1-.6,y1,z+.9],[x+.6,y1,z+.9]]),'#5d7f99');poly(T([[x,y+.6,z],[x,y1-.6,z],[x,y1-.6,z+.9],[x,y+.6,z+.9]]),'#4b6a82')}
  for(const d of b.doors||[]){const k=d.k||1.3,z=d.z||3;if(d.s!=null)poly(T([[d.s-k,y1,0],[d.s+k,y1,0],[d.s+k,y1,z],[d.s-k,y1,z]]),d.c);else poly(T([[x,d.w-k,0],[x,d.w+k,0],[x,d.w+k,z],[x,d.w-k,z]]),d.c)}
  if(b.sign)poly(T([[x,ym-1.8,h-1.7],[x,ym+1.8,h-1.7],[x,ym+1.8,h-.6],[x,ym-1.8,h-.6]]),'#f2f4f6');
- if(r&&gy){poly(T([[x1,y,h],[x1,y1,h],[xm,y1,h+r],[xm,y,h+r]]),col(b.roof,.8));p=T([[x,y,h],[x,y1,h],[xm,y1,h+r],[xm,y,h+r]]);poly(p,col(b.roof,1));b.polys.push(p)}
+ if(b.shed){p=T([[x,y,h],[x1,y,h+r],[x1,y1,h+r],[x,y1,h]]);poly(p,col(b.roof,.92));b.polys.push(p)}
+ else if(r&&gy){poly(T([[x1,y,h],[x1,y1,h],[xm,y1,h+r],[xm,y,h+r]]),col(b.roof,.8));p=T([[x,y,h],[x,y1,h],[xm,y1,h+r],[xm,y,h+r]]);poly(p,col(b.roof,1));b.polys.push(p)}
  else if(r){poly(T([[x,y,h],[x1,y,h],[x1,ym,h+r],[x,ym,h+r]]),col(b.roof,.82));p=T([[x,y1,h],[x1,y1,h],[x1,ym,h+r],[x,ym,h+r]]);poly(p,col(b.roof,1));b.polys.push(p)}
  else{p=T([[x,y,h],[x1,y,h],[x1,y1,h],[x,y1,h]]);poly(p,col(b.roof,1));b.polys.push(p)}
  if(sel&&sel.b===b)poly(p,null,'#ff8a3c',3)}
@@ -211,7 +212,7 @@ function ground(){ctx.fillStyle='#927c62';ctx.fillRect(0,0,W,H);
  const fp=[];for(let x=-200;x<=260;x+=3)fp.push([x,fEdge(x)]);poly(wp(fp.concat([[260,-300],[-200,-300]])),'#3f5236');
  poly(wp([[99,12],[260,12],[260,300],[130,162],[88,106],[90,80],[92,70],[95,45],[99,40]]),'#6f9450');
  poly(wp([[17,12.5],[23.5,10.5],[24,5.5],[81,5.5],[82,12.5],[99,13.5],[99,40],[95,45],[92,70],[90,80],[88,106],[82,98],[65,72],[47,52],[39,47],[27.5,39.5],[12,26.5]]),'#77787b');
- for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');poly(wp([[37.3,29.2],[39.4,29.2],[39.4,32.8],[37.6,33.3]]),'#bdb5a8');
+ for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');poly(wp([[37.3,29.2],[39.4,29.2],[39.4,32.8],[37.6,33.3]]),'#a77d55');
  poly(wp(ribbon(ROAD,1.7)),'#68696b');
 
  const s=S*zoom;for(const t of TREES){const p=P(t[0],t[1],t[2]);if(p[0]<-30||p[0]>W+30||p[1]<-30||p[1]>H+30)continue;ctx.fillStyle=t[3]<.5?'#2f4429':'#39502f';ctx.beginPath();ctx.arc(p[0],p[1],t[2]*s*1.1,0,7);ctx.fill();ctx.fillStyle=t[3]<.5?'#46633a':'#517041';ctx.beginPath();ctx.arc(p[0]-t[2]*s*.25,p[1]-t[2]*s*.35,t[2]*s*.6,0,7);ctx.fill()}
