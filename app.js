@@ -24,8 +24,8 @@ const B=[
  {k:'prov',n:'Provning',x:71.2,y:19,w:9,d:7.5,h:5.6,wall:DBR,roof:[72,62,58],sock:1,lab:1,doors:[{s:76,n:3,c:GD}],txt:'Färdiga maskiner testas här och körs sedan med truck till packavdelningen.'},
  {k:'lagers',n:'Lager',x:44.4,y:18.2,w:9.6,d:8.6,h:3,wall:OFF,roof:LG,win:1,lab:1,txt:'Lager intill svetsen.'},
  {k:'kontor',n:'Kontor',x:23.5,y:27,w:8.5,d:5,h:3.2,g:3,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Tjänstemännen sitter här.'},
- {k:'kok',n:'Kök',x:37.4,y:26.9,w:2.2,d:1.8,h:2.6,wall:OFF,roof:[60,62,66],txt:'Köket, inklämt mellan matsalen och hallen bakom.'},
- {k:'matsal',n:'Matsal',x:38.55,y:28.55,w:6.5,d:3.2,h:2.8,g:1.8,a:.7,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
+ {k:'kok',n:'Kök',x:37.3,y:26.6,w:2.1,d:2.4,h:2.6,wall:OFF,roof:[60,62,66],txt:'Köket, inklämt mellan matsalen och hallen bakom.'},
+ {k:'matsal',n:'Matsal',x:39.4,y:26.6,w:5.85,d:5.8,h:2.8,g:1.8,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
  {k:'kontor',n:'Kontor',x:33.9,y:27.9,w:5,d:2.6,h:2.6,g:.8,a:.7,wall:OFF,roof:[150,158,164],win:1,txt:'Kontor.'},
  {k:'kontor',n:'Kontor',x:32.2,y:30.6,w:2.6,d:2.6,h:2.6,g:1.4,wall:OFF,roof:ROOF,win:1,txt:'Kontor.'},
  {k:'entre',n:'Ingång',x:34.8,y:31.5,w:2.5,d:4,h:2.6,g:1.5,gy:1,wall:OFF,roof:ROOF,win:1,txt:'Ingången för besökare.'},
@@ -211,7 +211,7 @@ function ground(){ctx.fillStyle='#927c62';ctx.fillRect(0,0,W,H);
  const fp=[];for(let x=-200;x<=260;x+=3)fp.push([x,fEdge(x)]);poly(wp(fp.concat([[260,-300],[-200,-300]])),'#3f5236');
  poly(wp([[99,12],[260,12],[260,300],[130,162],[88,106],[90,80],[92,70],[95,45],[99,40]]),'#6f9450');
  poly(wp([[17,12.5],[23.5,10.5],[24,5.5],[81,5.5],[82,12.5],[99,13.5],[99,40],[95,45],[92,70],[90,80],[88,106],[82,98],[65,72],[47,52],[39,47],[27.5,39.5],[12,26.5]]),'#77787b');
- for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');poly(wp([[37.9,31.6],[39.2,29.9],[42.9,33.2],[38.2,33.6]]),'#bdb5a8');
+ for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');poly(wp([[37.3,29.2],[39.4,29.2],[39.4,32.8],[37.6,33.3]]),'#bdb5a8');
  poly(wp(ribbon(ROAD,1.7)),'#68696b');
 
  const s=S*zoom;for(const t of TREES){const p=P(t[0],t[1],t[2]);if(p[0]<-30||p[0]>W+30||p[1]<-30||p[1]>H+30)continue;ctx.fillStyle=t[3]<.5?'#2f4429':'#39502f';ctx.beginPath();ctx.arc(p[0],p[1],t[2]*s*1.1,0,7);ctx.fill();ctx.fillStyle=t[3]<.5?'#46633a':'#517041';ctx.beginPath();ctx.arc(p[0]-t[2]*s*.25,p[1]-t[2]*s*.35,t[2]*s*.6,0,7);ctx.fill()}
