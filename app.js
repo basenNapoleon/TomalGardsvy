@@ -12,22 +12,23 @@ const wp=a=>a.map(p=>P(p[0],p[1],p[2]||0));
 /* ---------- gården ---------- */
 const OFF=[236,236,232],BRN=[112,84,72],RED=[170,80,54],DBR=[92,68,58],ROOF=[44,44,48],LG=[178,180,182],SOCK=[214,208,196],DK=[54,52,54],LT=[150,152,154],WD='#e6e7e8',GD='#3d4248',SK=-.12,HK=.2;
 const B=[
- {k:'prod',n:'Produktionen',x:34.5,y:6,w:10,d:15.5,h:4.2,wall:RED,roof:[64,60,60],sock:1,lab:1,txt:'Produktionen. Ingen port mot gården.'},
+ {k:'prod',n:'Produktionen',x:34.5,y:6,w:10,d:15.5,h:4.6,wall:[190,94,60],roof:[58,56,58],sock:1,lab:1,txt:'Produktionen. Ingen port mot gården.'},
  {k:'prod',n:'Produktionen',x:44.5,y:11,w:9.5,d:10.5,h:4.4,wall:RED,roof:LG,sock:1,txt:'Produktionen. Ingen port mot gården.'},
- {k:'lagern',n:'Lager',x:54,y:11.5,w:17.2,d:6,h:4.8,wall:BRN,roof:LG,sock:1,lab:1,txt:'Lager bakom svets och godsmottagning.'},
+ {k:'bak',n:'',x:44.5,y:6,w:9.5,d:5,h:5.8,wall:DBR,roof:[72,62,58],txt:''},
+ {k:'lagern',n:'Lager',x:54,y:11.5,w:17.2,d:6,h:5.8,wall:DBR,roof:[72,62,58],sock:1,lab:1,txt:'Lager bakom svets och godsmottagning.'},
  {k:'slut',n:'Slutmontering',x:71.2,y:11.5,w:8.8,d:7.5,h:5.8,wall:DBR,roof:[72,62,58],sock:1,lab:1,txt:'Maskinerna slutmonteras här innan provning.'},
  {k:'svets',n:'Svets',x:54,y:17.5,w:8.5,d:9,h:4.6,wall:BRN,roof:LG,sock:1,lab:1,doors:[{s:57.5,n:6,c:GD}],txt:'Plåtleveranser lossas utanför och körs in genom Port 6.'},
  {k:'gods',n:'Godsmottagning',x:62.5,y:17.5,w:8.7,d:9,h:4.6,wall:BRN,roof:LG,sock:1,lab:1,doors:[{s:64.5,n:5,c:GD},{s:69,n:4,c:GD}],txt:'Alla paket- och fraktbilar kommer hit och lossas vid Port 5.'},
  {k:'prov',n:'Provning',x:71.2,y:19,w:8.8,d:7.5,h:5.6,wall:DBR,roof:[72,62,58],sock:1,lab:1,doors:[{s:76,n:3,c:GD}],txt:'Färdiga maskiner testas här och körs sedan med truck till packavdelningen.'},
- {k:'entre',n:'Entré',x:72,y:26.5,w:2,d:1.8,h:1.5,g:.8,wall:OFF,roof:DK,txt:'Entré till hallarna.'},
- {k:'kok',n:'Kök',x:34.5,y:21.5,w:11,d:5.5,h:3,wall:RED,roof:LG,win:1,lab:1,txt:'Köket.'},
- {k:'lagers',n:'Lager',x:45.5,y:21.5,w:8.5,d:5.3,h:3,wall:OFF,roof:[70,72,76],win:1,lab:1,txt:'Lager intill svetsen.'},
- {k:'kontor',n:'Kontor',x:25,y:27,w:8.5,d:5,h:3.2,g:3,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Tjänstemännen sitter här.'},
- {k:'kontor',n:'Kontor',x:36.25,y:28.25,w:6.5,d:3.8,h:2.6,g:2,a:.45,wall:OFF,roof:ROOF,win:1,txt:'Tjänstemännen sitter här.'},
- {k:'entre',n:'Ingång',x:33.6,y:32.6,w:3.4,d:3.2,h:2.4,g:1.6,a:SK,wall:OFF,roof:ROOF,win:1,txt:'Ingången för besökare.'},
- {k:'entre',n:'Ingång',x:34.9,y:35.8,w:1.4,d:1.2,h:1.8,a:SK,wall:[176,204,216],roof:OFF,txt:'Ingången för besökare.'},
- {k:'vast',n:'',x:26,y:21.5,w:8.5,d:4.5,h:2.6,wall:OFF,roof:[56,58,62],win:1,txt:''},
- {k:'matsal',n:'Matsal',x:43.6,y:27.2,w:4.8,d:5,h:2.8,a:SK,wall:OFF,roof:[70,72,76],win:1,lab:1,txt:'Matsalen, sitter ihop med kontoren.'},
+ {k:'b4',n:'',x:34.5,y:21.5,w:11,d:5.5,h:3.6,wall:[120,84,70],roof:LG,txt:''},
+ {k:'lagers',n:'Lager',x:45.5,y:21.5,w:8.5,d:5.3,h:3,wall:OFF,roof:LG,win:1,lab:1,txt:'Lager intill svetsen.'},
+ {k:'kontor',n:'Kontor',x:23.5,y:27,w:8.5,d:5,h:3.2,g:3,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Tjänstemännen sitter här.'},
+ {k:'kok',n:'Kök',x:37.4,y:26.9,w:2.2,d:1.8,h:2.6,wall:OFF,roof:[60,62,66],txt:'Köket, inklämt mellan matsalen och hallen bakom.'},
+ {k:'matsal',n:'Matsal',x:38.55,y:28.55,w:6.5,d:3.2,h:2.8,g:1.8,a:.7,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
+ {k:'kontor',n:'Kontor',x:33.9,y:27.9,w:5,d:2.6,h:2.6,g:.8,a:.7,wall:OFF,roof:[150,158,164],win:1,txt:'Kontor.'},
+ {k:'kontor',n:'Kontor',x:32.2,y:30.6,w:2.6,d:2.6,h:2.6,g:1.4,wall:OFF,roof:ROOF,win:1,txt:'Kontor.'},
+ {k:'entre',n:'Ingång',x:34.8,y:31.5,w:2.5,d:4,h:2.6,g:1.5,gy:1,wall:OFF,roof:ROOF,win:1,txt:'Ingången för besökare.'},
+ {k:'entre',n:'Ingång',x:35.4,y:35.5,w:1.4,d:1.2,h:1.8,wall:[176,204,216],roof:OFF,txt:'Ingången för besökare.'},
  {k:'kontor',n:'Kontor',lx:4,x:37.5,y:33.3,w:12,d:5.5,h:4.2,g:3.4,a:SK,wall:OFF,roof:ROOF,win:2,lab:1,txt:'Tjänstemännen sitter här. Gästingång på västra sidan, gästparkering framför.'},
  {k:'pack',n:'Packavdelning',x:68,y:40,w:24,d:13,h:4.4,g:2.8,a:HK,wall:BRN,roof:DK,sock:1,lab:1,doors:[{w:43.5,n:1,k:1.5,z:3.3,c:WD},{w:49.5,n:2,k:1.5,z:3.3,c:WD}],txt:'Maskiner packas för frakt. Truckarna kör in via Port 1, kundlastbilar lastas från Port 2. Lager i östra delen.'},
  {k:'silo',n:'Silohall',x:64.75,y:57.5,w:24.5,d:9,h:7.6,g:.8,a:HK,wall:[82,88,96],roof:[58,63,70],lab:1,sign:1,doors:[{w:59.8,n:9,k:1.7,z:4.2,c:'#c5c9cd'},{w:64.2,n:10,k:1.7,z:4.2,c:'#c5c9cd'}],txt:'Silos upp till 30 m kommer in via Port 10 för elinstallation och isolering, sedan vidare till kund.'}
@@ -51,7 +52,7 @@ const dx=.546,dy=.838,SE=RIN.concat([[47,50],[65,70]]);
  for(let r=0;r<2;r++)for(let i=0;i<8;i++){const x=75+1.75*i,y=r?75.5:71.5;SLOTS.push({x,y,a:Math.PI/2,path:SE.concat([[68.9,76],[72.3,74],[x,73.5],[x,y]])})}
  for(let i=0;i<11;i++){if(i===2||i===3)continue;const t=2+2.1*i;SLOTS.push({x:65+dx*t+2.5,y:70+dy*t-1.64,a:Math.atan2(dy,dx)+Math.PI/2,path:SE.concat([[65+dx*t,70+dy*t],[65+dx*t+2.5,70+dy*t-1.64]])})}}
 const GUEST=[[45,40.6],[47,40.6],[49,40.6]];
-const TAGS=[['Gästparkering',48,43],['Parkering',90.5,31],['Parkering',81.5,73.5],['Används ej',20.5,20],['Ingång',33.5,39.2]];
+const TAGS=[['Gästparkering',48,43],['Parkering',90.5,31],['Parkering',81.5,73.5],['Används ej',20.5,20],['Ingång',36.2,38.4]];
 const GOODS=[[72.5,36.6,'cyl',0,1.1,1.9],[74.6,37.1,'cyl',0,1.2,2.2],[76.6,37.8,'cyl',0,.9,1.7],[70.6,36.2,'cyl',0,.7,1.3],[81.6,23,'cont',1.57],[24.6,22.4,'cyl',0,1,6.5,[46,110,196]],[23.1,24,'cyl',0,.75,4,[226,228,230]],[18.2,16,'cont',0],[18.2,17.8,'cont',0],[18.2,19.6,'cont',0],[17.2,24.2,'cont',0],[21.5,26.5,'cont',1.57],[63.3,59,'stallning',.2],[63,57.3,'pall',.4],[64.5,55.2,'stallning',.2],[66.9,43.8,'stallning',1.77]];for(let i=0;i<6;i++)GOODS.push([96.4+srnd()*.9,17+i*2.4+srnd()*.5,srnd()<.5?'lada':'pall',srnd()*.4]);
 
 /* ---------- ritprimitiver ---------- */
@@ -209,7 +210,7 @@ function ground(){ctx.fillStyle='#927c62';ctx.fillRect(0,0,W,H);
  const fp=[];for(let x=-200;x<=260;x+=3)fp.push([x,fEdge(x)]);poly(wp(fp.concat([[260,-300],[-200,-300]])),'#3f5236');
  poly(wp([[99,12],[260,12],[260,300],[130,162],[88,106],[90,80],[92,70],[95,45],[99,40]]),'#6f9450');
  poly(wp([[17,12.5],[33,10.5],[34,5.5],[81,5.5],[82,12.5],[99,13.5],[99,40],[95,45],[92,70],[90,80],[88,106],[82,98],[65,72],[47,52],[39,47],[27.5,39.5],[12,26.5]]),'#77787b');
- for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');
+ for(const q of[[73.8,69.8,88.6,77.2],[43.6,39.4,50.6,41.8]])poly(wp([[q[0],q[1]],[q[2],q[1]],[q[2],q[3]],[q[0],q[3]]]),'#6d6e71');poly(wp([[16,10],[25,10],[25,31.5],[21,31.4],[15,26.3]]),'#6d6e71');poly(wp([[37.9,31.6],[39.2,29.9],[42.9,33.2],[38.2,33.6]]),'#bdb5a8');
  poly(wp(ribbon(ROAD,1.7)),'#68696b');
 
  const s=S*zoom;for(const t of TREES){const p=P(t[0],t[1],t[2]);if(p[0]<-30||p[0]>W+30||p[1]<-30||p[1]>H+30)continue;ctx.fillStyle=t[3]<.5?'#2f4429':'#39502f';ctx.beginPath();ctx.arc(p[0],p[1],t[2]*s*1.1,0,7);ctx.fill();ctx.fillStyle=t[3]<.5?'#46633a':'#517041';ctx.beginPath();ctx.arc(p[0]-t[2]*s*.25,p[1]-t[2]*s*.35,t[2]*s*.6,0,7);ctx.fill()}
