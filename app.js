@@ -128,7 +128,7 @@ function stepV(v,dt){let g=0;while(v.q.length&&g++<30){const a=v.q[0];
 const go=(v,pts)=>v.q.push({t:'go',pts}),wait=(v,m)=>v.q.push({t:'wait',m}),call=(v,fn)=>v.q.push({t:'call',fn});
 
 /* ---------- simulering ---------- */
-let clock=445,speed=1,vehicles=[],forks=[],jobs=[],sched=[],cars=[],sel=null,rigBusy=false,idn=0;
+let realMode=false,clock=445,speed=1,vehicles=[],forks=[],jobs=[],sched=[],cars=[],sel=null,rigBusy=false,idn=0;
 let stat={inn:0,pack:0,out:0},hall8=2,packStock=3;
 const P4=port('svets',6),P5=port('gods',5),P6=port('prov',3),P7=port('pack',1),P7B=port('pack',2),HUB=[64,36];
 const SPOTS=[{x:62,y:31},{x:60.5,y:34.5},{x:63.5,y:34.8}],TS4={x:58,y:32.2},TS7={x:61.5,y:47.5};
@@ -198,8 +198,8 @@ cars=SLOTS.map(sl=>({sl,col:pick(CARCOL),arr:rnd()<.85?330+(rnd()+rnd()+rnd())/3
 function stepCars(){for(const c of cars){
   if(c.st==='away'&&!c.done&&clock>=c.arr&&clock<c.dep){c.st='moving';const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg in',what:'–',order:'–'});go(v,c.sl.path);call(v,()=>{c.st='parked';kill(v)})}
   else if(c.st==='parked'&&clock>=c.dep){c.st='moving';c.done=true;const v=mkV('car',{name:'Personbil',col:c.col,sp:9,status:'Personal på väg hem',what:'–',order:'–',x:c.sl.x,y:c.sl.y,ang:c.sl.a,ta:c.sl.a});go(v,c.sl.path.slice(0,-1).reverse().concat([START]));call(v,()=>{c.st='away';kill(v)})}}}
-function step(dt){const night=(clock>1110||clock<290)&&!vehicles.length&&!farm.length&&!jobs.length;clock+=dt*CLOCK*(night?15:1);
- if(clock>=1440){clock-=1440;stubble=[];stat={inn:0,pack:0,out:0};cars.forEach(c=>c.done=false);buildSchedule(0)}
+function step(dt){let wrap=false;if(realMode){const n=new Date(),c=n.getHours()*60+n.getMinutes()+n.getSeconds()/60;wrap=c<clock-1;clock=c}else{const night=(clock>1110||clock<290)&&!vehicles.length&&!farm.length&&!jobs.length;clock+=dt*CLOCK*(night?15:1);if(clock>=1440){clock-=1440;wrap=true}}
+ if(wrap){stubble=[];stat={inn:0,pack:0,out:0};cars.forEach(c=>c.done=false);buildSchedule(0)}
  while(sched.length&&sched[0].t<=clock)sched.shift().fn();stepCars();
  traffic(dt);for(const f of forks){if(!f.busy&&jobs.length&&!f.retire)assign(f,jobs.shift());stepV(f,dt)}
  forks=forks.filter(f=>!(f.retire&&!f.busy));for(const v of vehicles.slice())stepV(v,dt);for(const v of farm.slice())stepV(v,dt)}
@@ -263,9 +263,9 @@ cv.addEventListener('pointerup',e=>{cv.style.cursor='grab';const d=drag;drag=nul
 function zoomBy(f,cx=W/2,cy=H/2){const z=Math.max(.6,Math.min(5,zoom*f)),k=z/zoom;panX=(panX+W/2-cx)*k-(W/2-cx);panY=(panY+H/2-cy)*k-(H/2-cy);zoom=z}
 cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomBy(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
 $('zin').onclick=()=>zoomBy(1.3);$('zout').onclick=()=>zoomBy(.77);$('zfit').onclick=()=>{zoom=1;panX=panY=0};
-const SK_='gardsvy';function save(){try{localStorage.setItem(SK_,JSON.stringify({speed,labels:$('labels').checked,tour:$('tour').checked,nVan:NV(),nOut:NO(),nSilo:NS(),nFork:+$('nFork').value}))}catch(e){}}
-function setSpeed(v){speed=v;[...$('speed').children].forEach(c=>c.setAttribute('aria-pressed',+c.dataset.s===v))}
-$('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;setSpeed(+b.dataset.s);save()};
+const SK_='gardsvy';function save(){try{localStorage.setItem(SK_,JSON.stringify({speed:realMode?'r':speed,labels:$('labels').checked,tour:$('tour').checked,nVan:NV(),nOut:NO(),nSilo:NS(),nFork:+$('nFork').value}))}catch(e){}}
+function setSpeed(v){const r=v==='r';if(r&&!realMode){realMode=true;const n=new Date();resetTo(n.getHours()*60+n.getMinutes())}realMode=r;speed=r?1:+v;$('tod').disabled=r;[...$('speed').children].forEach(c=>c.setAttribute('aria-pressed',c.dataset.s===String(v)))}
+$('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;setSpeed(b.dataset.s==='r'?'r':+b.dataset.s);save()};
 $('tod').oninput=e=>{$('todO').textContent=hhmm(+e.target.value);resetTo(+e.target.value)};
 $('nFork').oninput=e=>{$('nForkO').textContent=e.target.value;setForks(+e.target.value);save()};
 for(const id of['nVan','nOut','nSilo'])$(id).oninput=e=>{$(id+'O').textContent=e.target.value;buildSchedule(clock);save()};
@@ -278,5 +278,5 @@ $('bFull').onclick=()=>{const d=document;try{if(d.fullscreenElement)d.exitFullsc
 document.addEventListener('fullscreenchange',()=>{$('bFull').textContent=document.fullscreenElement?'Avsluta helskärm':'Helskärm'});
 let idleT=0;const wake=()=>{$('app').classList.remove('idle');clearTimeout(idleT);idleT=setTimeout(()=>$('app').classList.add('idle'),4000)};['pointermove','pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,wake));wake();
 try{const c=JSON.parse(localStorage.getItem(SK_)||'null');if(c){setSpeed(c.speed??1);$('labels').checked=c.labels!==false;$('tour').checked=!!c.tour;for(const k of['nVan','nOut','nSilo','nFork'])if(c[k]!=null){$(k).value=c[k];$(k+'O').textContent=$(k).value}}}catch(e){}
-{const n=new Date();resize();resetTo(n.getHours()*60+n.getMinutes());$('tod').value=clock;for(let i=0;i<240;i++)step(.05);ui(0);requestAnimationFrame(frame)}
+{const n=new Date();resize();resetTo(n.getHours()*60+n.getMinutes());try{const c=JSON.parse(localStorage.getItem(SK_)||'null');if(c&&c.speed==='r'){realMode=true;speed=1;$('tod').disabled=true;[...$('speed').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.s==='r'))}}catch(e){}$('tod').value=clock;for(let i=0;i<240;i++)step(.05);ui(0);requestAnimationFrame(frame)}
 })();
