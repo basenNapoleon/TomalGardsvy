@@ -25,7 +25,7 @@ const B=[
  {k:'lagers',n:'Lager',x:44.4,y:18.2,w:9.6,d:8.6,h:3,wall:OFF,roof:LG,win:1,lab:1,txt:'Lager intill svetsen.'},
  {k:'kontor',n:'Kontor',x:23.5,y:27,w:8.5,d:5,h:3.2,g:3,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Tjänstemännen sitter här.'},
  {k:'kok',n:'Kök',x:37.3,y:26.6,w:2.1,d:2.4,h:2.6,wall:OFF,roof:[60,62,66],txt:'Köket, inklämt mellan matsalen och hallen bakom.'},
- {k:'matsal',n:'Matsal',x:39.4,y:26.6,w:5.85,d:5.8,h:2.8,g:1.8,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
+ {k:'matsal',n:'Matsal',x:39.4,y:26.6,w:5.85,d:5.8,h:2.8,g:1.8,gy:1,wall:OFF,roof:ROOF,win:1,lab:1,txt:'Matsalen. Uteplatsen framför används när vädret tillåter.'},
  {k:'kontor',n:'Kontor',x:33.9,y:27.9,w:5,d:2.6,h:2.6,g:.8,a:.7,wall:OFF,roof:[150,158,164],win:1,txt:'Kontor.'},
  {k:'kontor',n:'Kontor',x:32.2,y:30.6,w:2.6,d:2.6,h:2.6,g:1.4,wall:OFF,roof:ROOF,win:1,txt:'Kontor.'},
  {k:'entre',n:'Ingång',x:34.8,y:31.5,w:2.5,d:4,h:2.6,g:1.5,gy:1,wall:OFF,roof:ROOF,win:1,txt:'Ingången för besökare.'},
